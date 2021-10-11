@@ -16,6 +16,9 @@ const RepairShopSchema = mongoose.Schema(
     accountNumber: {
       type: String,
     },
+    bank: {
+      type: String,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

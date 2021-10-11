@@ -1,4 +1,6 @@
 const RepairShop = require("./repairShop.model");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
 
 const listRepairShops = async (req, res, next) => {
   try {
@@ -14,6 +16,32 @@ const listRepairShops = async (req, res, next) => {
   }
 };
 
+const createRepairShop = async (req, res, next) => {
+  let imageFile = req.files.image;
+  const data = req.body;
+
+  try {
+    cloudinary.uploader.upload(imageFile.file, async function (error, result) {
+      if (error) {
+        return next(error);
+      }
+      const repairShop = new RepairShop({ ...data, imageUrl: result.url });
+      await repairShop.save();
+      res.status(201).json(repairShop);
+      fs.rm(`uploads/${imageFile.uuid}`, { recursive: true }, err => {
+        if (err) {
+          return next(error);
+        }
+      });
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ error: "*Please fill in all the fields of the form" });
+  }
+};
+
 module.exports = {
   listRepairShops,
+  createRepairShop,
 };
