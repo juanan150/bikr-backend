@@ -9,7 +9,7 @@ const login = async (req, res) => {
 
   if (user) {
     const token = jwt.sign({ userId: user._id }, config.jwtKey);
-    const { _id, name, email, role, address, phoneNumber, photoUrl } = user;
+    const { _id, name, email, role, imageUrl } = user;
     res.json({
       token,
       _id,
@@ -23,6 +23,23 @@ const login = async (req, res) => {
   }
 };
 
+const signup = async (req, res, next) => {
+  try {
+    let newUser;
+    newUser = await new User(req.body);
+    await newUser.save();
+
+    res.status(201).json(newUser);
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      res.status(422).json(err.errors);
+    } else {
+      next(err);
+    }
+  }
+};
+
 module.exports = {
   login,
+  signup,
 };
