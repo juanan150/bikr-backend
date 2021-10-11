@@ -39,7 +39,13 @@ const signup = async (req, res, next) => {
   }
 };
 
+const loadUser = async (req, res) => {
+  const { _id, name, email, role, imageUrl } = res.locals.user;
+  res.json({ _id, name, email, role, imageUrl });
+};
+
 module.exports = {
   login,
   signup,
+  loadUser,
 };
