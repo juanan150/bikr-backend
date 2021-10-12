@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const User = require("./user.model");
 const config = require("../../config");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -44,8 +46,56 @@ const loadUser = async (req, res) => {
   res.json({ _id, name, email, role, imageUrl });
 };
 
+const updateProfile = async (req, res, next) => {
+  const { _id, name, email, role } = req.body;
+  data = {
+    name,
+    email,
+    _id,
+    role,
+  };
+  const imageFile = req.files.image;
+  try {
+    if (imageFile) {
+      cloudinary.uploader.upload(
+        imageFile.file,
+        async function (error, result) {
+          if (error) {
+            return next(error);
+          }
+          fs.rm(`uploads/${imageFile.uuid}`, { recursive: true }, err => {
+            if (err) {
+              return next(error);
+            }
+          });
+          console.log(_id);
+          await User.findByIdAndUpdate(_id, {
+            ...data,
+            imageUrl: result.url,
+          });
+          res.status(200).json({
+            name,
+            email,
+            _id,
+            role,
+            imageUrl: result.url,
+          });
+          return;
+        }
+      );
+    } else {
+      await User.findByIdAndUpdate(_id, data);
+      res.status(200).json({ name, email, _id, role, imageUrl });
+      return;
+    }
+  } catch (error) {
+    res.status(401).json({ error: "User not found" });
+  }
+};
+
 module.exports = {
   login,
   signup,
   loadUser,
+  updateProfile,
 };

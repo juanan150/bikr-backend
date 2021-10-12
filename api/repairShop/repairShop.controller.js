@@ -41,7 +41,17 @@ const createRepairShop = async (req, res, next) => {
   }
 };
 
+const deleteRepairShop = async (req, res, next) => {
+  try {
+    await RepairShop.deleteOne({ _id: req.params.id });
+    res.status(204).end();
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   listRepairShops,
   createRepairShop,
+  deleteRepairShop,
 };
