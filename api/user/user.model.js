@@ -27,6 +27,9 @@ const UserSchema = mongoose.Schema(
     epaycoCustomerId: {
       type: String,
     },
+    epaycoCardId: {
+      type: String,
+    },
   },
   {
     timestamps: true,

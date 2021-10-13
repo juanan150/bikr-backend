@@ -17,7 +17,13 @@ const TransactionSchema = mongoose.Schema(
       ref: "Repairshop",
       required: true,
     },
-    billId: {
+    bill: {
+      type: String,
+    },
+    scheduleDate: {
+      type: String,
+    },
+    epaycoRef: {
       type: String,
     },
   },
