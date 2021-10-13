@@ -1,4 +1,5 @@
 const Transaction = require("./Transaction.model");
+const User = require("../user/user.model");
 const config = require("../../config");
 const epayco = require("epayco-sdk-node")({
   apiKey: config.epaycoPublicKey,
@@ -9,15 +10,30 @@ const epayco = require("epayco-sdk-node")({
 
 const payService = async (req, res, next) => {
   try {
+    const data = req.body;
     const cardInfo = {
-      "card[number]": req.body.cardNumber,
-      "card[exp_year]": req.body.expYear,
-      "card[exp_month]": req.body.expMonth,
-      "card[cvc]": req.body.cvc,
+      "card[number]": data.cardNumber,
+      "card[exp_year]": data.expYear,
+      "card[exp_month]": data.expMonth,
+      "card[cvc]": data.cvc,
     };
     const cardToken = await generateCardToken(cardInfo);
-    console.log(cardToken);
-    res.status(200).json({ cardToken });
+
+    const custInfo = {
+      token_card: cardToken.id,
+      name: res.locals.user.name,
+      last_name: "",
+      email: res.locals.user.email,
+      default: true,
+    };
+    const customerToken = await generateCustomerToken(custInfo);
+    console.log(res.locals.user._id);
+    await User.findByIdAndUpdate(res.locals.user._id, {
+      epaycoCustomerId: customerToken.data.customerId,
+      epaycoCardId: cardToken.id,
+    });
+
+    res.status(200).json({ customerToken });
   } catch (e) {
     next(e);
   }
@@ -26,8 +42,16 @@ const payService = async (req, res, next) => {
 const generateCardToken = async info => {
   try {
     const cardToken = await epayco.token.create(info);
-    console.log(cardToken);
     return cardToken;
+  } catch (e) {
+    return e;
+  }
+};
+
+const generateCustomerToken = async info => {
+  try {
+    const customerToken = await epayco.customers.create(info);
+    return customerToken;
   } catch (e) {
     return e;
   }
