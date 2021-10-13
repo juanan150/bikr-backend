@@ -24,10 +24,18 @@ const RepairShopSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-    services: {
-      type: Array,
-      required: true,
-    },
+    services: [
+      {
+        serviceName: {
+          type: String,
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

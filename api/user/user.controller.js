@@ -35,6 +35,12 @@ const signup = async (req, res, next) => {
   } catch (err) {
     if (err.name === "ValidationError") {
       res.status(422).json(err.errors);
+    } else if (err.name === "MongoServerError") {
+      res
+        .status(400)
+        .json({
+          error: "Email is already taken, please try with a different email",
+        });
     } else {
       next(err);
     }

@@ -7,7 +7,7 @@ const app = new Router();
 
 app.post("/login", controller.login);
 app.post("/signup", controller.signup);
-app.get("/me", auth, controller.loadUser);
-app.put("/:id", auth, controller.updateProfile);
+app.get("/me", auth.auth, controller.loadUser);
+app.put("/:id", auth.auth, controller.updateProfile);
 
 module.exports = app;

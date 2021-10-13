@@ -18,7 +18,10 @@ const listRepairShops = async (req, res, next) => {
 
 const createRepairShop = async (req, res, next) => {
   let imageFile = req.files.image;
-  const data = req.body;
+  let data = req.body;
+  data.services.forEach((serv, idx) => {
+    data.services[idx] = JSON.parse(serv);
+  });
 
   try {
     cloudinary.uploader.upload(imageFile.file, async function (error, result) {
@@ -27,17 +30,21 @@ const createRepairShop = async (req, res, next) => {
       }
       const repairShop = new RepairShop({ ...data, imageUrl: result.url });
       await repairShop.save();
-      res.status(201).json(repairShop);
       fs.rm(`uploads/${imageFile.uuid}`, { recursive: true }, err => {
         if (err) {
           return next(error);
         }
       });
+      res.status(201).json(repairShop);
     });
   } catch (error) {
-    res
-      .status(400)
-      .json({ error: "*Please fill in all the fields of the form" });
+    if (err.name === "MongoServerError") {
+      res
+        .status(400)
+        .json({ error: "*Please fill in all the fields of the form" });
+    } else {
+      next(error);
+    }
   }
 };
 

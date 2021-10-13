@@ -6,6 +6,7 @@ const UserSchema = mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
@@ -55,7 +56,7 @@ UserSchema.statics.authenticate = async (email, password) => {
 };
 
 UserSchema.path("role").validate(
-  value => /manager|admin|user/i.test(value),
+  value => /admin|owner|user/i.test(value),
   "role, assigned role is invalid"
 );
 
