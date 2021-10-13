@@ -5,6 +5,6 @@ const auth = require("../../auth");
 
 const app = new Router();
 
-app.post("/", auth, controller.payService);
+app.post("/", auth.auth, controller.payService);
 
 module.exports = app;
