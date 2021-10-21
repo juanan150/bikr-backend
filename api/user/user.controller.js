@@ -21,7 +21,7 @@ const login = async (req, res) => {
       imageUrl,
     });
   } else {
-    res.status(401).json({ error: "Invalid credentials" });
+    res.status(401).json({ error: "* Invalid credentials" });
   }
 };
 
@@ -31,16 +31,21 @@ const signup = async (req, res, next) => {
     newUser = await new User(req.body);
     await newUser.save();
 
-    res.status(201).json(newUser);
+    res.status(201).json({
+      user: {
+        email: newUser.email,
+        name: newUser.name,
+        role: newUser.role,
+        _id: newUser._id,
+      },
+    });
   } catch (err) {
     if (err.name === "ValidationError") {
       res.status(422).json(err.errors);
     } else if (err.name === "MongoServerError") {
-      res
-        .status(400)
-        .json({
-          error: "Email is already taken, please try with a different email",
-        });
+      res.status(400).json({
+        error: "Email is already taken, please try with a different email",
+      });
     } else {
       next(err);
     }
