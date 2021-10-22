@@ -1,3 +1,3 @@
-require("dotenv").config();
+require('dotenv').config()
 
-module.exports = require("./app");
+module.exports = require('./app')

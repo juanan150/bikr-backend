@@ -1,31 +1,31 @@
-const express = require("express");
+const express = require('express')
 
-const connectDB = require("./database");
-const expressConfig = require("./config/express");
-const config = require("./config");
-const routesConfig = require("./routes");
-const bb = require("express-busboy");
+const connectDB = require('./database')
+const expressConfig = require('./config/express')
+const config = require('./config')
+const routesConfig = require('./routes')
+const bb = require('express-busboy')
 
-connectDB();
+connectDB()
 
-const app = express();
+const app = express()
 
-expressConfig(app);
+expressConfig(app)
 bb.extend(app, {
   upload: true,
-  path: "uploads",
+  path: 'uploads',
   allowedPath: /./,
-  mimeTypeLimit: ["image/jpeg", "image/png"],
-});
-routesConfig(app);
+  mimeTypeLimit: ['image/jpeg', 'image/png'],
+})
+routesConfig(app)
 
 function startServer() {
-  const PORT = config.port;
+  const PORT = config.port
   app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT} ...`);
-  });
+    console.log(`Servidor corriendo en el puerto ${PORT} ...`)
+  })
 }
 
-setImmediate(startServer);
+setImmediate(startServer)
 
-module.exports = app;
+module.exports = app

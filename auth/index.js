@@ -1,68 +1,56 @@
-const jwt = require("jsonwebtoken");
-const User = require("../api/user/user.model");
-const config = require("../config");
+const jwt = require('jsonwebtoken')
+const User = require('../api/user/user.model')
+const config = require('../config')
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.get("Authorization");
-    const data = jwt.verify(token, config.jwtKey);
+    const token = req.get('Authorization')
+    const data = jwt.verify(token, config.jwtKey)
 
-    let user = await User.findOne({ _id: data.userId });
+    const user = await User.findOne({ _id: data.userId })
 
     if (user) {
-      res.locals.user = user;
-      next();
+      res.locals.user = user
+      next()
     } else {
-      user = await Foundation.findOne({ _id: data.userId });
-      if (user) {
-        res.locals.user = user;
-        next();
-      } else {
-        res.status(401).json({ error: "User not found" });
-        return;
-      }
+      res.status(401).json({ error: 'User not found' })
+      return
     }
   } catch (err) {
-    if (err.name === "JsonWebTokenError") {
-      res.status(401).json({ error: "Invalid Token" });
-      return;
+    if (err.name === 'JsonWebTokenError') {
+      res.status(401).json({ error: 'Invalid Token' })
+      return
     }
-    next(err);
+    next(err)
   }
-};
+}
 
 const authOwner = async (req, res, next) => {
   try {
-    const token = req.get("Authorization");
-    const data = jwt.verify(token, config.jwtKey);
+    const token = req.get('Authorization')
+    const data = jwt.verify(token, config.jwtKey)
 
-    let user = await User.findOne({ _id: data.userId });
+    const user = await User.findOne({ _id: data.userId })
 
     if (user) {
-      if (user.role === "owner") {
-        res.locals.user = user;
-        next();
+      if (user.role === 'owner') {
+        res.locals.user = user
+        next()
       } else {
-        res.status(403).json({ error: "User doesn't have permissions" });
-        return;
+        res.status(403).json({ error: "User doesn't have permissions" })
+        return
       }
     } else {
-      user = await Foundation.findOne({ _id: data.userId });
-      if (user) {
-        res.locals.user = user;
-        next();
-      } else {
-        res.status(401).json({ error: "User not found" });
-        return;
-      }
+      res.status(401).json({ error: 'User not found' })
+      return
     }
   } catch (err) {
-    if (err.name === "JsonWebTokenError") {
-      res.status(401).json({ error: "Invalid Token" });
-      return;
+    if (err.name === 'JsonWebTokenError') {
+      res.status(401).json({ error: 'Invalid Token' })
+      return
     }
-    next(err);
+    next(err)
   }
-};
+}
 
-module.exports = { auth, authOwner };
+module.exports = { auth, authOwner }

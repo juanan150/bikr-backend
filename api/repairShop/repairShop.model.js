@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
 const RepairShopSchema = mongoose.Schema(
   {
@@ -21,7 +21,7 @@ const RepairShopSchema = mongoose.Schema(
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     services: [
@@ -39,9 +39,9 @@ const RepairShopSchema = mongoose.Schema(
   },
   {
     timestamps: true,
-  }
-);
+  },
+)
 
-const Repairshop = mongoose.model("Repairshop", RepairShopSchema);
+const Repairshop = mongoose.model('Repairshop', RepairShopSchema)
 
-module.exports = Repairshop;
+module.exports = Repairshop

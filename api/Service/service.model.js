@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
 const ServiceSchema = mongoose.Schema(
   {
@@ -17,9 +17,9 @@ const ServiceSchema = mongoose.Schema(
   },
   {
     timestamps: true,
-  }
-);
+  },
+)
 
-const Service = mongoose.model("Service", ServiceSchema);
+const Service = mongoose.model('Service', ServiceSchema)
 
-module.exports = Service;
+module.exports = Service

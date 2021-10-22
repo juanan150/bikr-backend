@@ -1,15 +1,15 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
 const TransactionSchema = mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     repairShopId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Repairshop",
+      ref: 'Repairshop',
       required: true,
     },
     service: {
@@ -26,14 +26,14 @@ const TransactionSchema = mongoose.Schema(
       type: String,
     },
     value: {
-      type: Number
-    }
+      type: Number,
+    },
   },
   {
     timestamps: true,
-  }
-);
+  },
+)
 
-const RepaiShop = mongoose.model("Transaction", TransactionSchema);
+const RepaiShop = mongoose.model('Transaction', TransactionSchema)
 
-module.exports = RepaiShop;
+module.exports = RepaiShop
