@@ -24,9 +24,21 @@ const RepairShopSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    latitude: {
+      type: Number,
+      required: true,
+    },
+    longitude: {
+      type: Number,
+      required: true,
+    },
     services: [
       {
         serviceName: {
+          type: String,
+          required: true,
+        },
+        serviceDetails: {
           type: String,
           required: true,
         },

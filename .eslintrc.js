@@ -13,6 +13,7 @@ module.exports = {
     'space-before-function-paren': [
       'error',
       {
+        named: 'never',
         anonymous: 'always',
         asyncArrow: 'always',
       },
