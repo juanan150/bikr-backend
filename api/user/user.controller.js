@@ -57,12 +57,11 @@ const loadUser = async (req, res) => {
 }
 
 const updateProfile = async (req, res, next) => {
-  const { _id, name, email, role, imageUrl } = req.body
+  let user = {}
+  const { name, _id } = req.body
   const data = {
     name,
-    email,
     _id,
-    role,
   }
   const imageFile = req.files.image
   try {
@@ -73,32 +72,45 @@ const updateProfile = async (req, res, next) => {
           if (error) {
             return next(error)
           }
-          fs.rm(`uploads/${imageFile.uuid}`, { recursive: true }, err => {
+          fs.rm(`uploads/${imageFile.uuid}`, { recursive: true }, (err) => {
             if (err) {
               return next(error)
             }
           })
-          console.log(_id)
-          await User.findByIdAndUpdate(_id, {
-            ...data,
-            imageUrl: result.url,
-          })
-          res.status(200).json({
-            name,
-            email,
+
+          user = await User.findByIdAndUpdate(
             _id,
-            role,
-            imageUrl: result.url,
+            {
+              ...data,
+              imageUrl: result.url,
+            },
+            { returnDocument: 'after' },
+          )
+          res.status(200).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            imageUrl: user.imageUrl,
           })
         },
       )
     } else {
-      await User.findByIdAndUpdate(_id, data)
-      res.status(200).json({ name, email, _id, role, imageUrl })
+      user = await User.findByIdAndUpdate(_id, data, {
+        returnDocument: 'after',
+      })
+
+      res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        imageUrl: user.imageUrl,
+      })
       return
     }
   } catch (error) {
-    res.status(401).json({ error: 'User not found' })
+    res.status(404).json({ error: 'User not found' })
   }
 }
 

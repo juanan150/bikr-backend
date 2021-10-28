@@ -15,7 +15,6 @@ bb.extend(app, {
   upload: true,
   path: 'uploads',
   allowedPath: /./,
-  mimeTypeLimit: ['image/jpeg', 'image/png'],
 })
 routesConfig(app)
 
