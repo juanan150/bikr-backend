@@ -30,7 +30,7 @@ const createRepairShop = async (req, res, next) => {
       }
       const repairShop = new RepairShop({ ...data, imageUrl: result.url })
       await repairShop.save()
-      fs.rm(`uploads/${imageFile.uuid}`, { recursive: true }, err => {
+      fs.rm(`uploads/${imageFile.uuid}`, { recursive: true }, (err) => {
         if (err) {
           return next(error)
         }
@@ -57,8 +57,26 @@ const deleteRepairShop = async (req, res, next) => {
   }
 }
 
+const searchRepairShops = async (req, res, next) => {
+  try {
+    const page = req.query.page || 1
+    const repairShops = await RepairShop.find({
+      'services.serviceName': { $regex: req.query.q, $options: 'i' },
+    })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * 10)
+      .limit(10)
+
+    const count = repairShops.length
+    res.status(200).json({ page, count, repairShops })
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = {
   listRepairShops,
   createRepairShop,
   deleteRepairShop,
+  searchRepairShops,
 }
