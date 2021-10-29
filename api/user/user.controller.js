@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const User = require('./user.model')
+const Transaction = require('../transaction/transaction.model')
 const config = require('../../config')
 const cloudinary = require('cloudinary').v2
 const fs = require('fs')
@@ -53,7 +54,7 @@ const signup = async (req, res, next) => {
 
 const loadUser = async (req, res) => {
   const { _id, name, email, role, imageUrl } = res.locals.user
-  res.json({ _id, name, email, role, imageUrl })
+  res.status(200).json({ _id, name, email, role, imageUrl })
 }
 
 const updateProfile = async (req, res, next) => {
@@ -114,9 +115,40 @@ const updateProfile = async (req, res, next) => {
   }
 }
 
+const getServices = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const transactions = await Transaction.find({ userId: id })
+      .populate('repairShopId')
+      .sort({ scheduleDate: 1 })
+
+    const services = transactions.map((tr) => {
+      return {
+        serviceId: tr._id,
+        name: tr.repairShopId.name,
+        imageUrl: tr.repairShopId.imageUrl,
+        address: tr.repairShopId.address,
+        phone: tr.repairShopId.phone,
+        rating: tr.repairShopId.rating,
+        _id: tr.repairShopId._id,
+        scheduleDate: tr.scheduleDate,
+        latitude: tr.repairShopId.latitude,
+        longitude: tr.repairShopId.longitude,
+        service: tr.repairShopId.services.filter(
+          (ser) => ser.serviceName === tr.service,
+        )[0],
+      }
+    })
+    res.status(200).json(services)
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = {
   login,
   signup,
   loadUser,
   updateProfile,
+  getServices,
 }

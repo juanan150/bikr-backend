@@ -20,7 +20,7 @@ const TransactionSchema = mongoose.Schema(
       type: String,
     },
     scheduleDate: {
-      type: String,
+      type: Number,
     },
     epaycoRef: {
       type: String,

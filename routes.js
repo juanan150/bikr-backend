@@ -5,7 +5,7 @@
 const user = require('./api/user')
 const repairShop = require('./api/repairShop')
 const transaction = require('./api/transaction')
-const service = require('./api/Service')
+const service = require('./api/service')
 
 module.exports = (app) => {
   app.use('/api/users', user)

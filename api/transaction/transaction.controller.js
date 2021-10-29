@@ -1,4 +1,4 @@
-const Transaction = require('./Transaction.model')
+const Transaction = require('./transaction.model')
 const User = require('../user/user.model')
 const config = require('../../config')
 const epayco = require('epayco-sdk-node')({
@@ -68,7 +68,7 @@ const payService = async (req, res, next) => {
       service: data.service,
       repairShopId: data.repairShopId,
       bill: bill,
-      scheduleDate: Date.now(),
+      scheduleDate: data.scheduleDate,
       epaycoRef: payment.data.ref_payco,
       value: data.value,
     })
@@ -79,7 +79,7 @@ const payService = async (req, res, next) => {
   }
 }
 
-const generateCardToken = async info => {
+const generateCardToken = async (info) => {
   try {
     const cardToken = await epayco.token.create(info)
     return cardToken
@@ -88,7 +88,7 @@ const generateCardToken = async info => {
   }
 }
 
-const generateCustomerToken = async info => {
+const generateCustomerToken = async (info) => {
   try {
     const customerToken = await epayco.customers.create(info)
     return customerToken
@@ -97,7 +97,7 @@ const generateCustomerToken = async info => {
   }
 }
 
-const generatePayment = async info => {
+const generatePayment = async (info) => {
   const payment = epayco.charge.create(info)
   return payment
 }
