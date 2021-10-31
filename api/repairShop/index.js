@@ -9,5 +9,6 @@ app.get('/', controller.listRepairShops)
 app.post('/', auth.authOwner, controller.createRepairShop)
 app.delete('/:id', auth.authOwner, controller.deleteRepairShop)
 app.get('/search', auth.auth, controller.searchRepairShops)
+app.get('/:id/services', auth.auth, controller.getServices)
 
 module.exports = app

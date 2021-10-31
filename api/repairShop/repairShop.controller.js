@@ -1,6 +1,7 @@
 const RepairShop = require('./repairShop.model')
 const cloudinary = require('cloudinary').v2
 const fs = require('fs')
+const Transaction = require('../transaction/transaction.model')
 
 const listRepairShops = async (req, res, next) => {
   try {
@@ -63,9 +64,6 @@ const searchRepairShops = async (req, res, next) => {
     const repairShops = await RepairShop.find({
       'services.serviceName': { $regex: req.query.q, $options: 'i' },
     })
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * 10)
-      .limit(10)
 
     const count = repairShops.length
     res.status(200).json({ page, count, repairShops })
@@ -74,9 +72,52 @@ const searchRepairShops = async (req, res, next) => {
   }
 }
 
+const getServices = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const query = req?.query?.q
+    const repairShop = await RepairShop.findOne({ userId: id })
+    let transactions = []
+    if (query) {
+      transactions = await Transaction.find({
+        repairShopId: repairShop._id,
+        service: { $regex: query, $options: 'i' },
+      })
+        .populate('userId')
+        .populate('repairShopId')
+        .sort({ scheduleDate: 1 })
+    } else {
+      transactions = await Transaction.find({
+        repairShopId: repairShop._id,
+      })
+        .populate('userId')
+        .populate('repairShopId')
+        .sort({ scheduleDate: 1 })
+    }
+
+    const services = transactions.map((tr) => {
+      return {
+        serviceId: tr._id,
+        name: tr.userId.name,
+        imageUrl: tr.userId.imageUrl,
+        _id: tr.repairShopId._id,
+        userId: tr.userId._id,
+        scheduleDate: tr.scheduleDate,
+        service: tr.repairShopId.services.filter(
+          (ser) => ser.serviceName === tr.service,
+        )[0],
+      }
+    })
+    res.status(200).json(services)
+  } catch (e) {
+    res.status(404).json({ error: 'User not found' })
+  }
+}
+
 module.exports = {
   listRepairShops,
   createRepairShop,
   deleteRepairShop,
   searchRepairShops,
+  getServices,
 }

@@ -21,4 +21,13 @@ const createService = async (req, res, next) => {
   }
 }
 
-module.exports = { createService }
+const listServices = async (req, res, next) => {
+  try {
+    const services = await Service.find({}, null)
+    res.status(200).json({ services })
+  } catch (e) {
+    next(e)
+  }
+}
+
+module.exports = { createService, listServices }
