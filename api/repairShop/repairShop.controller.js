@@ -114,10 +114,21 @@ const getServices = async (req, res, next) => {
   }
 }
 
+const getRepairShop = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const repairShop = await RepairShop.findOne({ userId: id })
+    res.status(200).json(repairShop)
+  } catch (e) {
+    res.status(404).json({ error: 'Repair Shop not found' })
+  }
+}
+
 module.exports = {
   listRepairShops,
   createRepairShop,
   deleteRepairShop,
   searchRepairShops,
   getServices,
+  getRepairShop,
 }
