@@ -62,7 +62,7 @@ const searchRepairShops = async (req, res, next) => {
   try {
     const page = req.query.page || 1
     const repairShops = await RepairShop.find({
-      'services.serviceName': { $regex: req.query.q, $options: 'i' },
+      'services.serviceDetails': { $regex: req.query.q, $options: 'i' },
     })
 
     const count = repairShops.length
