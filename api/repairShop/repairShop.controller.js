@@ -43,6 +43,34 @@ const createRepairShop = async (req, res, next) => {
   }
 }
 
+const updateRepairShop = async (req, res, next) => {
+  const imageFile = req.files.image
+  const data = req.body
+  data.services = JSON.parse(data.services)
+  try {
+    cloudinary.uploader.upload(imageFile.file, async function (error, result) {
+      if (error) {
+        return next(error)
+      }
+      const repairShop = await RepairShop.findOneAndUpdate(
+        { _id: data._id },
+        { ...data, imageUrl: result.url },
+        { returnDocument: 'after' },
+      )
+      fs.rm(`uploads/${imageFile.uuid}`, { recursive: true }, (err) => {
+        if (err) {
+          return next(error)
+        }
+      })
+      res.status(200).json(repairShop)
+    })
+  } catch (error) {
+    res
+      .status(400)
+      .json({ error: '*Please fill in all the fields of the form' })
+  }
+}
+
 const deleteRepairShop = async (req, res, next) => {
   try {
     await RepairShop.deleteOne({ _id: req.params.id })
@@ -125,4 +153,5 @@ module.exports = {
   searchRepairShops,
   getServices,
   getRepairShop,
+  updateRepairShop,
 }
