@@ -124,6 +124,7 @@ const getServices = async (req, res, next) => {
         imageUrl: tr.userId.imageUrl,
         _id: tr.repairShopId._id,
         userId: tr.userId._id,
+        phoneNumber: tr.userId.phoneNumber,
         scheduleDate: tr.scheduleDate,
         service: tr.repairShopId.services.filter(
           (ser) => ser.serviceName === tr.service,

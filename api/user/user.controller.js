@@ -12,7 +12,7 @@ const login = async (req, res) => {
 
   if (user) {
     const token = jwt.sign({ userId: user._id }, config.jwtKey)
-    const { _id, name, email, role, imageUrl } = user
+    const { _id, name, email, role, imageUrl, phoneNumber } = user
     res.json({
       token,
       _id,
@@ -20,6 +20,7 @@ const login = async (req, res) => {
       name,
       role,
       imageUrl,
+      phoneNumber,
     })
   } else {
     res.status(401).json({ error: '* Invalid credentials' })
@@ -36,6 +37,7 @@ const signup = async (req, res, next) => {
         email: newUser.email,
         name: newUser.name,
         role: newUser.role,
+        phoneNumber: newUser.phoneNumber,
         _id: newUser._id,
       },
     })
@@ -53,16 +55,17 @@ const signup = async (req, res, next) => {
 }
 
 const loadUser = async (req, res) => {
-  const { _id, name, email, role, imageUrl } = res.locals.user
-  res.status(200).json({ _id, name, email, role, imageUrl })
+  const { _id, name, email, role, imageUrl, phoneNumber } = res.locals.user
+  res.status(200).json({ _id, name, email, role, imageUrl, phoneNumber })
 }
 
 const updateProfile = async (req, res, next) => {
   let user = {}
-  const { name, _id } = req.body
+  const { name, _id, phoneNumber } = req.body
   const data = {
     name,
     _id,
+    phoneNumber,
   }
   const imageFile = req.files.image
   try {
@@ -93,6 +96,7 @@ const updateProfile = async (req, res, next) => {
             email: user.email,
             role: user.role,
             imageUrl: user.imageUrl,
+            phoneNumber: user.phoneNumber,
           })
         },
       )
@@ -107,6 +111,7 @@ const updateProfile = async (req, res, next) => {
         email: user.email,
         role: user.role,
         imageUrl: user.imageUrl,
+        phoneNumber: user.phoneNumber,
       })
       return
     }
