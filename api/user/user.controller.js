@@ -4,6 +4,7 @@ const Transaction = require('../transaction/transaction.model')
 const config = require('../../config')
 const cloudinary = require('cloudinary').v2
 const fs = require('fs')
+const sendMail = require('../../utils/sendMail')
 
 const login = async (req, res) => {
   const { email, password } = req.body
@@ -11,17 +12,21 @@ const login = async (req, res) => {
   const user = await User.authenticate(email, password)
 
   if (user) {
-    const token = jwt.sign({ userId: user._id }, config.jwtKey)
-    const { _id, name, email, role, imageUrl, phoneNumber } = user
-    res.json({
-      token,
-      _id,
-      email,
-      name,
-      role,
-      imageUrl,
-      phoneNumber,
-    })
+    if (user.verified) {
+      const token = jwt.sign({ userId: user._id }, config.jwtKey)
+      const { _id, name, email, role, imageUrl, phoneNumber } = user
+      res.json({
+        token,
+        _id,
+        email,
+        name,
+        role,
+        imageUrl,
+        phoneNumber,
+      })
+    } else {
+      res.status(401).json({ error: '* Please verify your email' })
+    }
   } else {
     res.status(401).json({ error: '* Invalid credentials' })
   }
@@ -29,8 +34,18 @@ const login = async (req, res) => {
 
 const signup = async (req, res, next) => {
   try {
-    const newUser = await new User(req.body)
-    await newUser.save()
+    const verificationToken = Math.floor(
+      Math.random() * (999999 - 100000) + 100000,
+    ).toString()
+    const newUser = await new User({ ...req.body, verificationToken }).save()
+    sendMail({
+      to: newUser.email,
+      templateId: 'd-cb98f7ce5ac248ee955410abd4383224',
+      dynamicTemplateData: {
+        name: newUser.name,
+        verificationToken: verificationToken.toString(),
+      },
+    })
 
     res.status(201).json({
       user: {
@@ -39,6 +54,7 @@ const signup = async (req, res, next) => {
         role: newUser.role,
         phoneNumber: newUser.phoneNumber,
         _id: newUser._id,
+        verificationToken,
       },
     })
   } catch (err) {
@@ -51,6 +67,21 @@ const signup = async (req, res, next) => {
     } else {
       next(err)
     }
+  }
+}
+
+const verifyEmail = async (req, res) => {
+  const { token } = req.params
+  let user = await User.findOne({ verificationToken: token })
+  if (user) {
+    user = await User.findByIdAndUpdate(
+      user._id,
+      { verified: true, verificationToken: '' },
+      { returnDocument: 'after' },
+    )
+    res.status(200).json({ message: 'Email verified successfully' })
+  } else {
+    res.status(404).json({ error: '* Invalid token' })
   }
 }
 
@@ -156,4 +187,5 @@ module.exports = {
   loadUser,
   updateProfile,
   getServices,
+  verifyEmail,
 }

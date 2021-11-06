@@ -34,6 +34,13 @@ const UserSchema = mongoose.Schema(
     epaycoCardId: {
       type: String,
     },
+    verificationToken: {
+      type: String,
+    },
+    verified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

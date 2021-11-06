@@ -8,6 +8,7 @@ const app = new Router()
 app.post('/login', controller.login)
 app.post('/signup', controller.signup)
 app.get('/me', auth.auth, controller.loadUser)
+app.post('/verify/:token', controller.verifyEmail)
 app.put('/:id', auth.auth, controller.updateProfile)
 app.get('/:id/services', auth.auth, controller.getServices)
 
