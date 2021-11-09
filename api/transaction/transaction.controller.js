@@ -10,6 +10,47 @@ const epayco = require('epayco-sdk-node')({
 
 const scheduleService = async (req, res, next) => {
   try {
+    const data = req.body
+
+    await Transaction.create({
+      userId: res.locals.user._id,
+      service: data.service,
+      repairShopId: data.repairShopId,
+      scheduleDate: data.scheduleDate,
+      value: data.value,
+    })
+
+    res.status(200).json()
+  } catch (e) {
+    next(e)
+  }
+}
+
+const generateCardToken = async (info) => {
+  try {
+    const cardToken = await epayco.token.create(info)
+    return cardToken
+  } catch (e) {
+    return e
+  }
+}
+
+const generateCustomerToken = async (info) => {
+  try {
+    const customerToken = await epayco.customers.create(info)
+    return customerToken
+  } catch (e) {
+    return e
+  }
+}
+
+const generatePayment = async (info) => {
+  const payment = epayco.charge.create(info)
+  return payment
+}
+
+const payService = async (req, res, next) => {
+  try {
     let customer
     const data = req.body
     if (!res.locals.user.epaycoCustomerId) {
@@ -46,8 +87,8 @@ const scheduleService = async (req, res, next) => {
     const paymentInfo = {
       token_card: customer.epaycoCardId,
       customer_id: customer.epaycoCustomerId,
-      doc_type: data.docType,
-      doc_number: data.docNumber,
+      doc_type: 'CC',
+      doc_number: '1111111', // data.docNumber,
       name: customer.name,
       last_name: '',
       email: customer.email,
@@ -63,43 +104,19 @@ const scheduleService = async (req, res, next) => {
     }
     const payment = await generatePayment(paymentInfo)
 
-    await Transaction.create({
-      userId: res.locals.user._id,
-      service: data.service,
-      repairShopId: data.repairShopId,
-      bill: bill,
-      scheduleDate: data.scheduleDate,
-      epaycoRef: payment.data.ref_payco,
-      value: data.value,
-    })
+    await Transaction.findOneAndUpdate(
+      { _id: data.serviceId },
+      {
+        bill: bill,
+        epaycoRef: payment.data.ref_payco,
+        status: 'payed',
+      },
+    )
 
     res.status(200).json()
   } catch (e) {
     next(e)
   }
-}
-
-const generateCardToken = async (info) => {
-  try {
-    const cardToken = await epayco.token.create(info)
-    return cardToken
-  } catch (e) {
-    return e
-  }
-}
-
-const generateCustomerToken = async (info) => {
-  try {
-    const customerToken = await epayco.customers.create(info)
-    return customerToken
-  } catch (e) {
-    return e
-  }
-}
-
-const generatePayment = async (info) => {
-  const payment = epayco.charge.create(info)
-  return payment
 }
 
 const updateService = async (req, res, next) => {
@@ -123,4 +140,5 @@ const updateService = async (req, res, next) => {
 module.exports = {
   scheduleService,
   updateService,
+  payService,
 }
