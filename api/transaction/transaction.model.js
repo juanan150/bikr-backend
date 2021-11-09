@@ -28,6 +28,9 @@ const TransactionSchema = mongoose.Schema(
     value: {
       type: Number,
     },
+    status: {
+      type: String,
+    },
   },
   {
     timestamps: true,

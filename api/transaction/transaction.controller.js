@@ -8,7 +8,7 @@ const epayco = require('epayco-sdk-node')({
   test: true,
 })
 
-const payService = async (req, res, next) => {
+const scheduleService = async (req, res, next) => {
   try {
     let customer
     const data = req.body
@@ -103,5 +103,5 @@ const generatePayment = async (info) => {
 }
 
 module.exports = {
-  payService,
+  scheduleService,
 }
