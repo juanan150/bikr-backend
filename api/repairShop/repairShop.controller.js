@@ -129,6 +129,7 @@ const getServices = async (req, res, next) => {
         service: tr.repairShopId.services.filter(
           (ser) => ser.serviceName === tr.service,
         )[0],
+        status: tr.status,
       }
     })
     res.status(200).json(services)

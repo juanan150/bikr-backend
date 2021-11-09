@@ -102,6 +102,25 @@ const generatePayment = async (info) => {
   return payment
 }
 
+const updateService = async (req, res, next) => {
+  try {
+    const data = req.body
+    const service = await Transaction.findByIdAndUpdate(
+      data.serviceId,
+      {
+        status: data.status,
+      },
+      {
+        returnDocument: 'after',
+      },
+    )
+    res.status(200).json(service)
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = {
   scheduleService,
+  updateService,
 }
